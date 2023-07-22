@@ -10,7 +10,7 @@ class Snake:
     def __init__(self):
         self.clock = pygame.time.Clock()
 
-        self.display_size = 900
+        self.display_size = 600
         self.display = pygame.display.set_mode((self.display_size, self.display_size))
 
         self.snake_block_size = 30
