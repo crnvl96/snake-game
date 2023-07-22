@@ -8,157 +8,69 @@ from constants import colors
 
 class Snake:
     def __init__(self):
+        self.clock = pygame.time.Clock()
+
+        self.display_size = 900
+        self.display = pygame.display.set_mode((self.display_size, self.display_size))
+
+        self.snake_block_size = 30
+        self.snake_speed = 7
+        self.initial_snake_absissa_position = self.display_size / 2
+        self.initial_snake_ordinate_position = self.display_size / 2
+        self.snake_absissa = self.initial_snake_absissa_position
+        self.snake_ordinate = self.initial_snake_ordinate_position
+        self.snake_absissa_increment = 0
+        self.snake_ordinate_increment = 0
+        self.snake_body_sections = [
+            [
+                self.initial_snake_absissa_position,
+                self.initial_snake_ordinate_position,
+            ]
+        ]
+        self.snake_length = 1
+
+        self.game_over = False
+        self.game_close = False
+
+        self.can_snake_go_up = True
+        self.can_snake_go_down = True
+        self.can_snake_go_left = True
+        self.can_snake_go_right = True
+
+        self.food_absissa = 0
+        self.food_ordinate = 0
+        self.available_food_positions = []
+
+        self.font_size = 35
+        self.alert_font_style = "hack"
+        self.score_font_style = "comicsansms"
+
+        self.caption_text = "Snake game by @crnvl96"
+
         self.start_game()
 
     @property
-    def clock(self):
-        return pygame.time.Clock()
-
-    @property
-    def snake_block_size(self):
-        return 25
-
-    @property
-    def snake_speed(self):
-        return 7
-
-    @property
-    def display_width(self):
-        return 800
-
-    @property
-    def display_height(self):
-        return 600
-
-    @property
-    def snake_absissa(self):
-        return self._snake_absissa
-
-    @snake_absissa.setter
-    def snake_absissa(self, value):
-        self._snake_absissa = value
-
-    @property
-    def snake_absissa_increment(self):
-        return self._snake_absissa_increment
-
-    @snake_absissa_increment.setter
-    def snake_absissa_increment(self, value):
-        self._snake_absissa_increment = value
-
-    @property
-    def snake_ordinate(self):
-        return self._snake_ordinate
-
-    @snake_ordinate.setter
-    def snake_ordinate(self, value):
-        self._snake_ordinate = value
-
-    @property
-    def snake_ordinate_increment(self):
-        return self._snake_ordinate_increment
-
-    @snake_ordinate_increment.setter
-    def snake_ordinate_increment(self, value):
-        self._snake_ordinate_increment = value
-
-    @property
-    def snake_body_sections(self):
-        return self._snake_body_sections
-
-    @snake_body_sections.setter
-    def snake_body_sections(self, value):
-        self._snake_body_sections = value
-
-    @property
-    def snake_length(self):
-        return self._snake_length
-
-    @snake_length.setter
-    def snake_length(self, value):
-        self._snake_length = value
-
-    @property
-    def food_absissa(self):
-        return self._food_absissa
-
-    @food_absissa.setter
-    def food_absissa(self, value):
-        self._food_absissa = value
-
-    @property
-    def food_ordinate(self):
-        return self._food_ordinate
-
-    @food_ordinate.setter
-    def food_ordinate(self, value):
-        self._food_ordinate = value
-
-    @property
-    def game_over(self):
-        return self._game_over
-
-    @game_over.setter
-    def game_over(self, value):
-        self._game_over = value
-
-    @property
-    def game_close(self):
-        return self._game_close
-
-    @game_close.setter
-    def game_close(self, value):
-        self._game_close = value
-
-    @property
-    def display(self):
-        return self._display
-
-    @display.setter
-    def display(self, value):
-        self._display = value
-
-    @property
     def alert_font(self):
-        return self._alert_font
+        return pygame.font.SysFont(self.alert_font_style, self.font_size)
 
     @property
     def score_font(self):
-        return self._score_font
-
-    @property
-    def initial_snake_absissa_position(self):
-        return self.display_width / 2
-
-    @property
-    def initial_snake_ordinate_position(self):
-        return self.display_height / 2
-
-    def generate_display(self):
-        self._display = pygame.display.set_mode(
-            (self.display_width, self.display_height)
-        )
+        return pygame.font.SysFont(self.score_font_style, self.font_size)
 
     def update_display(self):
         return pygame.display.update()
 
     def generate_caption(self):
-        return pygame.display.set_caption("Snake game by @crnvl96")
+        return pygame.display.set_caption(self.caption_text)
 
-    def set_alert_font(self):
-        self._alert_font = pygame.font.SysFont("bahnschrift", 25)
-
-    def set_score_font(self):
-        self._score_font = pygame.font.SysFont("comicsansms", 35)
-
-    def show_message(self, font, msg, color):
-        font_opts = {
+    def show_message(self, font, message, color):
+        font_options = {
             "alert": self.alert_font,
             "score": self.score_font,
         }
 
         self.display.blit(
-            font_opts[font].render(msg, True, color),
+            font_options[font].render(message, True, color),
             [
                 self.initial_snake_absissa_position,
                 self.initial_snake_ordinate_position,
@@ -166,61 +78,72 @@ class Snake:
         )
 
     def render_snake_body(self):
-        for element in self.snake_body_sections:
-            pygame.draw.rect(
-                self.display,
-                colors.black,
-                [
-                    element[0],
-                    element[1],
-                    self.snake_block_size,
-                    self.snake_block_size,
-                ],
-            )
+        for section in self.snake_body_sections:
+            absissa, ordinate = section
+            self.draw_block(colors.black, absissa, ordinate)
 
     def draw_block(
         self,
         color,
-        snake_absissa_current_position,
-        snake_ordinate_current_position,
+        absissa,
+        ordinate,
     ):
         return pygame.draw.rect(
             self.display,
             color,
             [
-                snake_absissa_current_position,
-                snake_ordinate_current_position,
+                absissa,
+                ordinate,
                 self.snake_block_size,
                 self.snake_block_size,
             ],
         )
 
+    def seed_food(self):
+        def get_available_positions():
+            options = self.available_food_positions
+            disabled_options = self.snake_body_sections
+            available_options = [
+                option for option in options if option not in disabled_options
+            ]
+            return random.choice(available_options)
+
+        return get_available_positions()
+
     def start_game(self):
-        self.game_over = False
-        self.game_close = False
-        self.snake_absissa = self.initial_snake_absissa_position
-        self.snake_ordinate = self.initial_snake_ordinate_position
-
-        self.snake_absissa_increment = 0
-        self.snake_ordinate_increment = 0
-
         pygame.init()
-        self.generate_display()
         self.update_display()
         self.generate_caption()
-        self.set_alert_font()
-        self.set_score_font()
+
+    def disable_movement(self, direction):
+        def reset_disabled_movements():
+            self.can_snake_go_up = True
+            self.can_snake_go_down = True
+            self.can_snake_go_left = True
+            self.can_snake_go_right = True
+
+        reset_disabled_movements()
+
+        if direction == "up":
+            self.can_snake_go_up = False
+        elif direction == "down":
+            self.can_snake_go_down = False
+        elif direction == "left":
+            self.can_snake_go_left = False
+        elif direction == "right":
+            self.can_snake_go_right = False
 
     def update_game_frames(self):
         self.snake_absissa += self.snake_absissa_increment
         self.snake_ordinate += self.snake_ordinate_increment
 
         self.display.fill(colors.blue)
-
         self.draw_block(colors.green, self.food_absissa, self.food_ordinate)
+
         snake_head = []
         snake_head.append(self.snake_absissa)
         snake_head.append(self.snake_ordinate)
+
         self.snake_body_sections.append(snake_head)
 
         if len(self.snake_body_sections) > self.snake_length:
@@ -235,25 +158,13 @@ class Snake:
         self.update_display()
 
         if (
-            abs(self.snake_absissa - self.food_absissa) <= 5
-            and abs(self.snake_ordinate - self.food_ordinate) <= 5
+            self.snake_absissa == self.food_absissa
+            and self.snake_ordinate == self.food_ordinate
         ):
             self.food_absissa, self.food_ordinate = self.seed_food()
             self.snake_length += 1
 
         self.clock.tick(self.snake_speed)
-
-    def seed_food(self):
-        def seed(range):
-            return (
-                round(
-                    random.randrange(0, range - self.snake_block_size)
-                    / self.snake_block_size
-                )
-                * self.snake_block_size
-            )
-
-        return seed(self.display_width), seed(self.display_height)
 
     def quit_game(self):
         pygame.quit()
@@ -266,8 +177,10 @@ class Snake:
         self.display.blit(value, [0, 0])
 
     def run(self):
-        self.snake_body_sections = []
-        self.snake_length = 1
+        for abs_block in range(0, self.display_size, self.snake_block_size):
+            for ord_block in range(0, self.display_size, self.snake_block_size):
+                coordinates = [abs_block, ord_block]
+                self.available_food_positions.append(coordinates)
 
         self.food_absissa, self.food_ordinate = self.seed_food()
 
@@ -290,38 +203,45 @@ class Snake:
                             self.game_over = True
                             self.game_close = False
                         if event.key == pygame.K_c:
-                            self.start_game()
+                            self.__init__()
                             self.run()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.game_over = True
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_LEFT:
+                    if event.key == pygame.K_LEFT and self.can_snake_go_left:
                         self.snake_absissa_increment = -self.snake_block_size
                         self.snake_ordinate_increment = 0
-                    elif event.key == pygame.K_RIGHT:
+                        self.disable_movement("right")
+                    elif event.key == pygame.K_RIGHT and self.can_snake_go_right:
                         self.snake_absissa_increment = self.snake_block_size
                         self.snake_ordinate_increment = 0
-                    elif event.key == pygame.K_UP:
+                        self.disable_movement("left")
+                    elif event.key == pygame.K_UP and self.can_snake_go_up:
                         self.snake_absissa_increment = 0
                         self.snake_ordinate_increment = -self.snake_block_size
-                    elif event.key == pygame.K_DOWN:
+                        self.disable_movement("down")
+                    elif event.key == pygame.K_DOWN and self.can_snake_go_down:
                         self.snake_absissa_increment = 0
                         self.snake_ordinate_increment = self.snake_block_size
+                        self.disable_movement("up")
+                    else:
+                        continue
 
             if (
-                self.snake_absissa >= self.display_width
+                self.snake_absissa >= self.display_size
                 or self.snake_absissa < 0
-                or self.snake_ordinate >= self.display_height
+                or self.snake_ordinate >= self.display_size
                 or self.snake_ordinate < 0
             ):
                 self.game_close = True
 
             self.update_game_frames()
 
+        self.display.fill(colors.white)
         self.show_message("alert", "Bye!", colors.red)
-        pygame.display.update()
+        self.update_display()
         time.sleep(1)
 
         self.quit_game()
