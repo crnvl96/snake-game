@@ -1,6 +1,8 @@
 # Snake Game
 
-#### Video Demo: https://youtu.be/9LcKFbr0_Uc
+#### Demo
+
+https://github.com/crnvl96/snake-game/assets/84354013/a47ae52b-dd1d-4cad-a790-43b91e82cac8
 
 #### Usage
 - You must have python3 installed in yout machine
