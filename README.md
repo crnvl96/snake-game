@@ -2,9 +2,10 @@
 
 #### Demo
 
-https://github.com/crnvl96/snake-game/assets/84354013/a47ae52b-dd1d-4cad-a790-43b91e82cac8
+https://github.com/crnvl96/snake-game/assets/84354013/c13e49dd-aa6f-4da0-a125-9d9f829f321a
 
 #### Usage
+
 - You must have python3 installed in yout machine
 - Clone the repo, and navigate to its folder
 - Run `python3 -m venv venv` to create a local virtual environment to install the project dependencies
