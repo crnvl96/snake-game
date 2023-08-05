@@ -6,72 +6,6 @@ import pygame
 from constants import colors
 
 
-def disable_movements(self, direction):
-    def reset_disabled_movements():
-        self.can_snake_go_up = True
-        self.can_snake_go_down = True
-        self.can_snake_go_left = True
-        self.can_snake_go_right = True
-
-    reset_disabled_movements()
-
-    if direction == "up":
-        self.can_snake_go_up = False
-    elif direction == "down":
-        self.can_snake_go_down = False
-    elif direction == "left":
-        self.can_snake_go_left = False
-    elif direction == "right":
-        self.can_snake_go_right = False
-
-
-def generate_coordinates(self):
-    for abs_block in range(0, self.display_size, self.snake_block_size):
-        for ord_block in range(0, self.display_size, self.snake_block_size):
-            coordinates = [abs_block, ord_block]
-            self.available_food_positions.append(coordinates)
-
-
-def draw(self, color, absissa, ordinate):
-    return pygame.draw.rect(
-        self.display,
-        color,
-        [
-            absissa,
-            ordinate,
-            self.snake_block_size,
-            self.snake_block_size,
-        ],
-    )
-
-
-def show_message(self, font, message, color):
-    font_options = {
-        "alert": self.alert_font,
-        "score": self.score_font,
-    }
-
-    return self.display.blit(
-        font_options[font].render(message, True, color),
-        [
-            self.initial_snake_absissa_position,
-            self.initial_snake_ordinate_position,
-        ],
-    )
-
-
-def seed_food(self):
-    def get_available_positions():
-        options = self.available_food_positions
-        disabled_options = self.snake_body_sections
-        available_options = [
-            option for option in options if option not in disabled_options
-        ]
-        return random.choice(available_options)
-
-    return get_available_positions()
-
-
 class Snake:
     def __init__(self):
         self.clock = pygame.time.Clock()
@@ -130,7 +64,18 @@ class Snake:
         return pygame.display.set_caption(self.caption_text)
 
     def show_message(self, font, message, color):
-        return show_message(self, font, message, color)
+        font_options = {
+            "alert": self.alert_font,
+            "score": self.score_font,
+        }
+
+        return self.display.blit(
+            font_options[font].render(message, True, color),
+            [
+                self.initial_snake_absissa_position,
+                self.initial_snake_ordinate_position,
+            ],
+        )
 
     def render_snake_body(self):
         for section in self.snake_body_sections:
@@ -143,10 +88,27 @@ class Snake:
         absissa,
         ordinate,
     ):
-        return draw(self, color, absissa, ordinate)
+        return pygame.draw.rect(
+            self.display,
+            color,
+            [
+                absissa,
+                ordinate,
+                self.snake_block_size,
+                self.snake_block_size,
+            ],
+        )
 
     def seed_food(self):
-        return seed_food(self)
+        def get_available_positions():
+            options = self.available_food_positions
+            disabled_options = self.snake_body_sections
+            available_options = [
+                option for option in options if option not in disabled_options
+            ]
+            return random.choice(available_options)
+
+        return get_available_positions()
 
     def start_game(self):
         pygame.init()
@@ -154,7 +116,22 @@ class Snake:
         self.generate_caption()
 
     def disable_movement(self, direction):
-        return disable_movements(self, direction)
+        def reset_disabled_movements():
+            self.can_snake_go_up = True
+            self.can_snake_go_down = True
+            self.can_snake_go_left = True
+            self.can_snake_go_right = True
+
+        reset_disabled_movements()
+
+        if direction == "up":
+            self.can_snake_go_up = False
+        elif direction == "down":
+            self.can_snake_go_down = False
+        elif direction == "left":
+            self.can_snake_go_left = False
+        elif direction == "right":
+            self.can_snake_go_right = False
 
     def update_game_frames(self):
         self.snake_absissa += self.snake_absissa_increment
@@ -200,7 +177,22 @@ class Snake:
         self.display.blit(value, [0, 0])
 
     def generate_coordinates(self):
-        return generate_coordinates(self)
+        for abs_block in range(0, self.display_size, self.snake_block_size):
+            for ord_block in range(0, self.display_size, self.snake_block_size):
+                coordinates = [abs_block, ord_block]
+                self.available_food_positions.append(coordinates)
+
+    def handle_game_events(self, event):
+        if event.type == pygame.QUIT:
+            self.game_over = True
+            self.game_close = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:
+                self.game_over = True
+                self.game_close = False
+            if event.key == pygame.K_c:
+                self.__init__()
+                self.run()
 
     def run(self):
         self.generate_coordinates()
@@ -218,16 +210,7 @@ class Snake:
                 self.update_display()
 
                 for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        self.game_over = True
-                        self.game_close = False
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_q:
-                            self.game_over = True
-                            self.game_close = False
-                        if event.key == pygame.K_c:
-                            self.__init__()
-                            self.run()
+                    self.handle_game_events(event)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
