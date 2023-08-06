@@ -2,7 +2,7 @@
 
 #### Demo
 
-https://github.com/crnvl96/snake-game/assets/84354013/c13e49dd-aa6f-4da0-a125-9d9f829f321a
+https://github.com/crnvl96/snake-game/assets/84354013/b7dc1afd-e0e0-4b99-a981-731ec54b191f
 
 #### Usage
 
