@@ -13,7 +13,7 @@ https://github.com/crnvl96/snake-game/assets/84354013/c13e49dd-aa6f-4da0-a125-9d
   ```
 - Create a virtual environment and install project dependencies
   ```bash
-  python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt
+  python3 -m venv venv && source venv/bin/activate && pip3 install -r requirements.txt
   ```
 - Execute the game
   ```bash
