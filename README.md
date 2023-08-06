@@ -16,9 +16,9 @@ https://github.com/crnvl96/snake-game/assets/84354013/c13e49dd-aa6f-4da0-a125-9d
   python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt
   ```
 - Execute the game
-```bash
-python3 project.py
-```
+  ```bash
+  python3 project.py
+  ```
 
 #### How to play
 - Just use your keyboard arrows to control the snake
